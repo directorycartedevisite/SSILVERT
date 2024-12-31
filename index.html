@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte de Visite Numérique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 350px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .logo-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .logo {
+            width: 60px;
+            height: auto;
+        }
+        .card img.profile-pic {
+            width: 100px;
+            height: auto;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .card h2 {
+            font-size: 1.5em;
+            color: #333;
+        }
+        .card p {
+            font-size: 1em;
+            color: #666;
+            margin: 10px 0;
+        }
+        .card a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .card a:hover {
+            text-decoration: underline;
+        }
+        .company-info {
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .action-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo-container">
+            <img src="1735323812547.jpg" alt="Logo de l'entreprise" class="logo">
+        </div>
+        <img src="1735656785698.jpg" alt="Photo de profil" class="profile-pic">
+        <h2>Stéphane Silvert</h2>
+        <p>Product Manager -Pole équipements fixes SFR</p>
+        <p>Téléphone : <a href="tel:+33626822503">+33 6 26 82 25 03</a></p>
+        <p>Email : <a href="mailto:stephane.silvert@sfr.com">stephane.silvert@sfr.com</a></p>
+        <p><a href="https://www.linkedin.com/in/stephane-silvert-56a6231" target="_blank">LinkedIn</a></p>
+        <div class="company-info">
+            <p><strong>SFR</strong></p>
+            <p>Adresse : Campus Altice, 16 Rue du Général Alain de Boissieu, 75015 Paris, France</p>
+        </div>
+        <div class="action-buttons">
+            <button class="action-btn" onclick="addToContacts()">
+                <i class="fas fa-user-plus"></i> Ajouter aux contacts
+            </button>
+            <button class="action-btn" onclick="shareContact()">
+                <i class="fas fa-share-alt"></i> Partager
+            </button>
+        </div>
+    </div>
+
+    <script>
+    function addToContacts() {
+        const contact = {
+            name: "Stéphane Silvert",
+            tel: "+33626822503",
+            email: "stephane.silvert@sfr.com"
+        };
+
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            const props = ['name', 'tel', 'email'];
+            navigator.contacts.select(props, {multiple: false})
+            .then((contacts) => {
+                contacts[0].name = [contact.name];
+                contacts[0].tel = [contact.tel];
+                contacts[0].email = [contact.email];
+                return contacts[0].getProperties(props);
+            })
+            .then((properties) => {
+                alert("Contact ajouté avec succès !");
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("Erreur lors de l'ajout du contact.");
+            });
+        } else {
+            const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${contact.name}
+TEL:${contact.tel}
+EMAIL:${contact.email}
+END:VCARD`;
+            const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "contact.vcf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    function shareContact() {
+        const contactInfo = {
+            title: 'Contact de stéphane Silvert',
+            text: 'Stéphane Silvert\nProduct Manager - Pole équipements fixes SFR\nTél: +33 6 26 82 25 03\nEmail: stephane.silvert@sfr.com',
+            url: window.location.href
+        };
+
+        if (navigator.share) {
+            navigator.share(contactInfo)
+                .then(() => console.log('Partage réussi'))
+                .catch((error) => console.log('Erreur lors du partage', error));
+        } else {
+            alert('Le partage n\'est pas pris en charge par votre navigateur. Vous pouvez copier l\'URL et la partager manuellement.');
+        }
+    }
+    </script>
+</body>
+</html>
